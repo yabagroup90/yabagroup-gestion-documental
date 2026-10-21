@@ -12,7 +12,7 @@ import {
   Sparkles
 } from 'lucide-react';
 import { MODULOS_CONFIG } from '../../data/modulesConfig';
-import { dataService } from '../../services/dataService';
+import { dataService, getLatestDocumentVersions } from '../../services/dataService';
 
 export default function ClientDashboard({ 
   empresa, 
@@ -215,10 +215,9 @@ export default function ClientDashboard({
               {/* Checklist de requisitos de este módulo */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                 {moduloInfo?.requisitosCliente.map((req) => {
-                  const documentosDelRequisito = requisitosSubidos
-                    .filter(d => d.categoria === req.nombre)
-                    .sort((a, b) => String(b.fechaSubidaHora || b.fechaSubida || '').localeCompare(String(a.fechaSubidaHora || a.fechaSubida || '')));
-                  const docSubido = documentosDelRequisito[0];
+                  const docSubido = getLatestDocumentVersions(
+                    requisitosSubidos.filter(d => d.categoria === req.nombre)
+                  )[0];
 
                   return (
                     <div 

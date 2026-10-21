@@ -53,6 +53,23 @@ const mapDocumento = (documento) => ({
   archivoDisponible: Boolean(documento.ruta_storage)
 });
 
+const getDocumentoTimestamp = (documento) =>
+  documento.fechaSubidaHora || documento.fechaSubida || documento.id || '';
+
+export const getLatestDocumentVersions = (documentos = []) => {
+  const latestByCategory = new Map();
+
+  documentos.forEach((documento) => {
+    const key = `${documento.expedienteId}|${documento.tipo}|${documento.categoria}`;
+    const current = latestByCategory.get(key);
+    if (!current || String(getDocumentoTimestamp(documento)).localeCompare(String(getDocumentoTimestamp(current))) > 0) {
+      latestByCategory.set(key, documento);
+    }
+  });
+
+  return Array.from(latestByCategory.values());
+};
+
 export const ALL_EMPRESAS = [
   {
     id: 'emp-1',
@@ -644,6 +661,7 @@ export const dataService = {
       tamano: `${(file.size / (1024 * 1024)).toFixed(1)} MB`,
       formato: file.name.split('.').pop().toUpperCase(),
       fechaSubida: new Date().toISOString().split('T')[0],
+      fechaSubidaHora: new Date().toISOString(),
       subidoPor,
       estado: tipo === 'requisito_cliente' ? 'pendiente' : 'aprobado',
       observaciones: observaciones || (tipo === 'requisito_cliente' ? 'En espera de revisión técnica por YabaGroup.' : 'Documento oficial entregado por YabaGroup.')

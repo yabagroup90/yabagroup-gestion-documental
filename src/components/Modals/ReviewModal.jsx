@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { X, CheckCircle2, AlertTriangle, FileText, Download, MessageSquare } from 'lucide-react';
-import { dataService } from '../../services/dataService';
+import { dataService, getLatestDocumentVersions } from '../../services/dataService';
 
 export default function ReviewModal({ isOpen, onClose, expediente, documentos = [], onUpdateDocEstado }) {
-  const docsCliente = documentos
-    .filter(d => d.expedienteId === expediente?.id && d.tipo === 'requisito_cliente')
-    .sort((a, b) => String(b.fechaSubidaHora || b.fechaSubida || '').localeCompare(String(a.fechaSubidaHora || a.fechaSubida || '')));
+  const docsCliente = getLatestDocumentVersions(
+    documentos.filter(d => d.expedienteId === expediente?.id && d.tipo === 'requisito_cliente')
+  );
   const documentosKey = docsCliente.map(doc => `${doc.id}:${doc.estado}:${doc.nombreArchivo}`).join('|');
 
   const [selectedDocId, setSelectedDocId] = useState(docsCliente[0]?.id || null);
