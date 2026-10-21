@@ -64,8 +64,21 @@ export default function App() {
   useEffect(() => {
     const session = dataService.getCurrentSession();
     if (session) {
-      setUsuarioActual(session);
-      loadData(session);
+      dataService.refreshSession(session)
+        .then((refreshedSession) => {
+          if (!refreshedSession) {
+            dataService.logout();
+            setIsLoading(false);
+            return;
+          }
+          setUsuarioActual(refreshedSession);
+          loadData(refreshedSession);
+        })
+        .catch((err) => {
+          console.error('Error actualizando la sesión:', err);
+          setUsuarioActual(session);
+          loadData(session);
+        });
     } else {
       setIsLoading(false);
     }

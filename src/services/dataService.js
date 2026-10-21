@@ -474,6 +474,40 @@ export const dataService = {
     }
   },
 
+  refreshSession: async (currentSession) => {
+    if (!isSupabaseConfigured || !supabase || !currentSession?.id) {
+      return currentSession;
+    }
+
+    const { data: authData, error: authError } = await supabase.auth.getUser();
+    if (authError || !authData?.user) {
+      return null;
+    }
+
+    const userSup = authData.user;
+    const { data: profile, error: profileError } = await supabase
+      .from('perfiles_usuarios')
+      .select('id, email, nombre_completo, rol, organizacion_id')
+      .eq('id', userSup.id)
+      .maybeSingle();
+
+    if (profileError) {
+      throw new Error(`No se pudo actualizar el perfil: ${profileError.message}`);
+    }
+
+    const localUser = ALL_USUARIOS.find((user) => user.email.toLowerCase() === userSup.email?.toLowerCase());
+    const session = {
+      id: userSup.id,
+      email: userSup.email,
+      nombre: profile?.nombre_completo || localUser?.nombre || userSup.user_metadata?.full_name || userSup.email,
+      rol: profile?.rol || localUser?.rol || userSup.app_metadata?.role || 'cliente',
+      empresaId: profile?.organizacion_id || null,
+      razonSocial: localUser?.razonSocial || localUser?.nombre || '',
+    };
+    setStorage(STORAGE_KEYS.SESSION, session);
+    return session;
+  },
+
   logout: () => {
     localStorage.removeItem(STORAGE_KEYS.SESSION);
   },
