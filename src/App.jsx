@@ -83,6 +83,17 @@ export default function App() {
     return () => window.removeEventListener('storage', handleStorageChange);
   }, []);
 
+  // Consultar cambios remotos para reflejar revisiones realizadas por otro usuario.
+  useEffect(() => {
+    if (!usuarioActual || !dataService.isLive) return undefined;
+
+    const intervalId = window.setInterval(() => {
+      loadData(usuarioActual);
+    }, 5000);
+
+    return () => window.clearInterval(intervalId);
+  }, [usuarioActual]);
+
   // Login handler
   const handleLogin = async (email, password) => {
     const session = await dataService.login(email, password);
