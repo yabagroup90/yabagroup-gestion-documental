@@ -33,9 +33,9 @@ export default function App() {
   };
 
   // Carga de datos
-  const loadData = async (user = usuarioActual) => {
+  const loadData = async (user = usuarioActual, showLoading = true) => {
     try {
-      setIsLoading(true);
+      if (showLoading) setIsLoading(true);
       const [emps, exps, allDocs] = await Promise.all([
         dataService.getEmpresas(),
         dataService.getExpedientes(),
@@ -56,7 +56,7 @@ export default function App() {
     } catch (err) {
       console.error('Error cargando datos:', err);
     } finally {
-      setIsLoading(false);
+      if (showLoading) setIsLoading(false);
     }
   };
 
@@ -75,7 +75,7 @@ export default function App() {
   useEffect(() => {
     const handleStorageChange = (event) => {
       if (event.key === 'yabagroup_documentos_v2') {
-        loadData();
+        loadData(usuarioActual, false);
       }
     };
 
@@ -88,7 +88,7 @@ export default function App() {
     if (!usuarioActual || !dataService.isLive) return undefined;
 
     const intervalId = window.setInterval(() => {
-      loadData(usuarioActual);
+      loadData(usuarioActual, false);
     }, 5000);
 
     return () => window.clearInterval(intervalId);
@@ -100,7 +100,7 @@ export default function App() {
 
     const refreshAdminData = () => {
       if (document.visibilityState === 'hidden') return;
-      loadData(usuarioActual);
+      loadData(usuarioActual, false);
     };
 
     window.addEventListener('pageshow', refreshAdminData);
@@ -148,7 +148,7 @@ export default function App() {
   };
 
   const handleOpenReviewModal = async (expediente) => {
-    await loadData(usuarioActual);
+    await loadData(usuarioActual, false);
     setReviewModalExpediente(expediente);
   };
 
