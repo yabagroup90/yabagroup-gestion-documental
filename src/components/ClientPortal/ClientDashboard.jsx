@@ -217,9 +217,8 @@ export default function ClientDashboard({
                 {moduloInfo?.requisitosCliente.map((req) => {
                   const documentosDelRequisito = requisitosSubidos
                     .filter(d => d.categoria === req.nombre)
-                    .sort((a, b) => String(b.fechaSubida || '').localeCompare(String(a.fechaSubida || '')));
-                  const docSubido = documentosDelRequisito.find(d => d.estado === 'observaciones')
-                    || documentosDelRequisito[0];
+                    .sort((a, b) => String(b.fechaSubidaHora || b.fechaSubida || '').localeCompare(String(a.fechaSubidaHora || a.fechaSubida || '')));
+                  const docSubido = documentosDelRequisito[0];
 
                   return (
                     <div 

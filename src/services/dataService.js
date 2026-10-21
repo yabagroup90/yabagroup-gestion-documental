@@ -46,6 +46,7 @@ const mapDocumento = (documento) => ({
     : '0.0 MB',
   formato: documento.formato,
   fechaSubida: documento.created_at?.split('T')[0],
+  fechaSubidaHora: documento.created_at,
   subidoPor: documento.subido_por_email,
   estado: documento.estado_validacion,
   observaciones: documento.observaciones || '',

@@ -3,7 +3,10 @@ import { X, CheckCircle2, AlertTriangle, FileText, Download, MessageSquare } fro
 import { dataService } from '../../services/dataService';
 
 export default function ReviewModal({ isOpen, onClose, expediente, documentos = [], onUpdateDocEstado }) {
-  const docsCliente = documentos.filter(d => d.expedienteId === expediente?.id && d.tipo === 'requisito_cliente');
+  const docsCliente = documentos
+    .filter(d => d.expedienteId === expediente?.id && d.tipo === 'requisito_cliente')
+    .sort((a, b) => String(b.fechaSubidaHora || b.fechaSubida || '').localeCompare(String(a.fechaSubidaHora || a.fechaSubida || '')));
+  const documentosKey = docsCliente.map(doc => `${doc.id}:${doc.estado}:${doc.nombreArchivo}`).join('|');
 
   const [selectedDocId, setSelectedDocId] = useState(docsCliente[0]?.id || null);
   const [observacion, setObservacion] = useState('');
@@ -14,7 +17,7 @@ export default function ReviewModal({ isOpen, onClose, expediente, documentos = 
   useEffect(() => {
     setSelectedDocId(docsCliente[0]?.id || null);
     setObservacion(docsCliente[0]?.observaciones || '');
-  }, [isOpen, expediente?.id]);
+  }, [isOpen, expediente?.id, documentosKey]);
 
   if (!isOpen || !expediente) return null;
 
