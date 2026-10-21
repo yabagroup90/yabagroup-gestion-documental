@@ -333,24 +333,61 @@ export const dataService = {
     const cleanEmail = String(email || '').trim().toLowerCase();
     const cleanPass = String(password || '').trim();
 
+    console.log('[Login] Intentando con:', cleanEmail);
+    console.log('[Login] isSupabaseConfigured:', isSupabaseConfigured);
+
+    // Intentar con Supabase primero (si está configurado)
+    if (isSupabaseConfigured && supabase) {
+      try {
+        console.log('[Login] Intentando autenticación con Supabase...');
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email: cleanEmail,
+          password: cleanPass,
+        });
+        if (!error && data?.user) {
+          console.log('[Login] Supabase OK:', data.user.email);
+          const userSup = data.user;
+          // Buscar datos adicionales en el mock local (rol, empresaId, etc.)
+          const localUser = ALL_USUARIOS.find(u => u.email.toLowerCase() === cleanEmail);
+          const session = {
+            id: userSup.id,
+            email: userSup.email,
+            nombre: localUser?.nombre || userSup.user_metadata?.full_name || cleanEmail,
+            rol: localUser?.rol || userSup.app_metadata?.role || 'cliente',
+            empresaId: localUser?.empresaId || null,
+            razonSocial: localUser?.razonSocial || localUser?.nombre || '',
+          };
+          setStorage(STORAGE_KEYS.SESSION, session);
+          return session;
+        }
+        console.warn('[Login] Supabase falló, intentando con usuarios locales. Error:', error?.message);
+      } catch (err) {
+        console.warn('[Login] Excepción Supabase, intentando con usuarios locales:', err.message);
+      }
+    }
+
+    // Fallback siempre disponible: usuarios locales (mock)
+    console.log('[Login] Buscando en usuarios locales...');
     const usuarios = getMergedStorage(STORAGE_KEYS.USUARIOS, ALL_USUARIOS, 'email');
-    const user = usuarios.find(u => 
-      String(u.email).toLowerCase() === cleanEmail && 
+    console.log('[Login] Usuarios disponibles:', usuarios.map(u => u.email));
+    const user = usuarios.find(u =>
+      String(u.email).toLowerCase() === cleanEmail &&
       String(u.password) === cleanPass
     );
-
     if (user) {
+      console.log('[Login] Usuario local encontrado:', user.email, '| rol:', user.rol);
       const session = {
         id: user.id,
         email: user.email,
         nombre: user.nombre,
         rol: user.rol,
         empresaId: user.empresaId,
-        razonSocial: user.razonSocial || user.nombre
+        razonSocial: user.razonSocial || user.nombre,
       };
       setStorage(STORAGE_KEYS.SESSION, session);
       return session;
     }
+    console.warn('[Login] No se encontró usuario con esas credenciales.');
     return null;
   },
 
