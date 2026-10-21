@@ -127,6 +127,11 @@ export default function App() {
     showToast(`Estado de documento actualizado a: ${nuevoEstado}`);
   };
 
+  const handleOpenReviewModal = async (expediente) => {
+    await loadData(usuarioActual);
+    setReviewModalExpediente(expediente);
+  };
+
   // Habilitar cliente nuevo
   const handleHabilitarCliente = async (datos) => {
     await dataService.habilitarCliente(datos);
@@ -184,7 +189,7 @@ export default function App() {
             documentos={documentos}
             onOpenHabilitarClienteModal={() => setShowHabilitarModal(true)}
             onOpenUploadModal={setUploadModalConfig}
-            onOpenReviewModal={setReviewModalExpediente}
+            onOpenReviewModal={handleOpenReviewModal}
             onUpdateEstado={(id, est, av) => dataService.updateExpedienteEstado(id, est, av).then(loadData)}
           />
         )}
