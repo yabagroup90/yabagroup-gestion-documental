@@ -94,6 +94,26 @@ export default function App() {
     return () => window.clearInterval(intervalId);
   }, [usuarioActual]);
 
+  // Recargar datos cuando el administrador vuelve a la aplicación o actualiza la página.
+  useEffect(() => {
+    if (!usuarioActual || usuarioActual.rol !== 'admin') return undefined;
+
+    const refreshAdminData = () => {
+      if (document.visibilityState === 'hidden') return;
+      loadData(usuarioActual);
+    };
+
+    window.addEventListener('pageshow', refreshAdminData);
+    window.addEventListener('focus', refreshAdminData);
+    document.addEventListener('visibilitychange', refreshAdminData);
+
+    return () => {
+      window.removeEventListener('pageshow', refreshAdminData);
+      window.removeEventListener('focus', refreshAdminData);
+      document.removeEventListener('visibilitychange', refreshAdminData);
+    };
+  }, [usuarioActual]);
+
   // Login handler
   const handleLogin = async (email, password) => {
     const session = await dataService.login(email, password);
