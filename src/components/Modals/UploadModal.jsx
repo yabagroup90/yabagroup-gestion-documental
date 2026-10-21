@@ -1,10 +1,8 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { X, UploadCloud, AlertCircle } from 'lucide-react';
 
 export default function UploadModal({ isOpen, onClose, config, onUploadSuccess }) {
-  if (!isOpen || !config) return null;
-
-  const { expedienteId, tipo, categoriasDisponibles = [], categoriaPreseleccionada } = config;
+  const { expedienteId, tipo, categoriasDisponibles = [], categoriaPreseleccionada, reemplazaDocumentoId } = config || {};
 
   const [categoria, setCategoria] = useState(categoriaPreseleccionada || categoriasDisponibles[0] || 'Documento General');
   const [file, setFile] = useState(null);
@@ -13,6 +11,15 @@ export default function UploadModal({ isOpen, onClose, config, onUploadSuccess }
   const [errorMsg, setErrorMsg] = useState('');
 
   const isCliente = tipo === 'requisito_cliente';
+
+  useEffect(() => {
+    setCategoria(categoriaPreseleccionada || categoriasDisponibles[0] || 'Documento General');
+    setFile(null);
+    setObservaciones('');
+    setErrorMsg('');
+  }, [config]);
+
+  if (!isOpen || !config) return null;
 
   const handleFileChange = (e) => {
     if (e.target.files && e.target.files[0]) {
@@ -34,7 +41,7 @@ export default function UploadModal({ isOpen, onClose, config, onUploadSuccess }
         expedienteId,
         tipo,
         categoria,
-        reemplazaDocumentoId: config.reemplazaDocumentoId,
+        reemplazaDocumentoId,
         file,
         subidoPor: isCliente ? 'contacto@constructoraandina.com' : 'asesor@yabagroup.com',
         observaciones

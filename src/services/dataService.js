@@ -728,6 +728,9 @@ export const dataService = {
 
       const { data, error } = await query.select('*');
       if (error) throw new Error(`No se pudo actualizar el estado: ${error.message}`);
+      if (!data || data.length === 0) {
+        throw new Error('No se pudo actualizar el documento. Verifica que tengas permisos para revisarlo.');
+      }
       return (data || []).map(mapDocumento);
     }
 

@@ -1,11 +1,9 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { X, CheckCircle2, AlertTriangle, FileText, Download, MessageSquare } from 'lucide-react';
 import { dataService } from '../../services/dataService';
 
 export default function ReviewModal({ isOpen, onClose, expediente, documentos = [], onUpdateDocEstado }) {
-  if (!isOpen || !expediente) return null;
-
-  const docsCliente = documentos.filter(d => d.expedienteId === expediente.id && d.tipo === 'requisito_cliente');
+  const docsCliente = documentos.filter(d => d.expedienteId === expediente?.id && d.tipo === 'requisito_cliente');
 
   const [selectedDocId, setSelectedDocId] = useState(docsCliente[0]?.id || null);
   const [observacion, setObservacion] = useState('');
@@ -13,10 +11,19 @@ export default function ReviewModal({ isOpen, onClose, expediente, documentos = 
 
   const selectedDoc = docsCliente.find(d => d.id === selectedDocId) || docsCliente[0];
 
+  useEffect(() => {
+    setSelectedDocId(docsCliente[0]?.id || null);
+    setObservacion(docsCliente[0]?.observaciones || '');
+  }, [isOpen, expediente?.id]);
+
+  if (!isOpen || !expediente) return null;
+
   const handleAprobar = async (docId) => {
     setIsSaving(true);
     try {
       await onUpdateDocEstado(docId, 'aprobado', 'Documento verificado y aprobado conforme a requisitos técnicos.');
+    } catch (error) {
+      alert(error.message || 'No se pudo aprobar el documento.');
     } finally {
       setIsSaving(false);
     }
@@ -31,6 +38,8 @@ export default function ReviewModal({ isOpen, onClose, expediente, documentos = 
     try {
       await onUpdateDocEstado(docId, 'observaciones', observacion);
       setObservacion('');
+    } catch (error) {
+      alert(error.message || 'No se pudo solicitar la corrección.');
     } finally {
       setIsSaving(false);
     }
