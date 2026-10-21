@@ -5,6 +5,7 @@
 -- =========================================================================
 
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
 
 -- 1. TABLA: ORGANIZACIONES / EMPRESAS CLIENTES
 CREATE TABLE IF NOT EXISTS public.organizaciones (
@@ -98,6 +99,54 @@ CREATE TABLE IF NOT EXISTS public.audit_logs (
     detalle TEXT,
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
+
+ALTER TABLE public.organizaciones ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.perfiles_usuarios ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.modulos_servicio ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.requisitos_plantilla ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.expedientes ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.documentos ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.audit_logs ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Usuarios autenticados pueden consultar organizaciones" ON public.organizaciones;
+CREATE POLICY "Usuarios autenticados pueden consultar organizaciones"
+  ON public.organizaciones FOR SELECT TO authenticated USING (true);
+
+DROP POLICY IF EXISTS "Usuarios autenticados pueden consultar perfiles" ON public.perfiles_usuarios;
+CREATE POLICY "Usuarios autenticados pueden consultar perfiles"
+  ON public.perfiles_usuarios FOR SELECT TO authenticated USING (true);
+
+DROP POLICY IF EXISTS "Usuarios autenticados pueden consultar catalogos" ON public.modulos_servicio;
+CREATE POLICY "Usuarios autenticados pueden consultar catalogos"
+  ON public.modulos_servicio FOR SELECT TO authenticated USING (true);
+
+DROP POLICY IF EXISTS "Usuarios autenticados pueden consultar requisitos" ON public.requisitos_plantilla;
+CREATE POLICY "Usuarios autenticados pueden consultar requisitos"
+  ON public.requisitos_plantilla FOR SELECT TO authenticated USING (true);
+
+DROP POLICY IF EXISTS "Usuarios autenticados pueden consultar expedientes" ON public.expedientes;
+CREATE POLICY "Usuarios autenticados pueden consultar expedientes"
+  ON public.expedientes FOR SELECT TO authenticated USING (true);
+
+DROP POLICY IF EXISTS "Usuarios autenticados pueden consultar documentos" ON public.documentos;
+CREATE POLICY "Usuarios autenticados pueden consultar documentos"
+  ON public.documentos FOR SELECT TO authenticated USING (true);
+
+DROP POLICY IF EXISTS "Usuarios autenticados pueden crear documentos" ON public.documentos;
+CREATE POLICY "Usuarios autenticados pueden crear documentos"
+  ON public.documentos FOR INSERT TO authenticated WITH CHECK (true);
+
+DROP POLICY IF EXISTS "Usuarios autenticados pueden actualizar documentos" ON public.documentos;
+CREATE POLICY "Usuarios autenticados pueden actualizar documentos"
+  ON public.documentos FOR UPDATE TO authenticated USING (true) WITH CHECK (true);
+
+DROP POLICY IF EXISTS "Usuarios autenticados pueden eliminar documentos" ON public.documentos;
+CREATE POLICY "Usuarios autenticados pueden eliminar documentos"
+  ON public.documentos FOR DELETE TO authenticated USING (true);
+
+DROP POLICY IF EXISTS "Usuarios autenticados pueden consultar logs" ON public.audit_logs;
+CREATE POLICY "Usuarios autenticados pueden consultar logs"
+  ON public.audit_logs FOR SELECT TO authenticated USING (true);
 
 -- =========================================================================
 -- DATOS SEMILLA (SEED DATA)

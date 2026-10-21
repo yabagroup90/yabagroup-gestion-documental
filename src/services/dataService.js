@@ -8,6 +8,50 @@ const STORAGE_KEYS = {
   DOCUMENTOS: 'yabagroup_documentos_v2'
 };
 
+const uploadedFiles = new Map();
+
+const mapEmpresa = (empresa) => ({
+  id: empresa.id,
+  nit: empresa.nit,
+  razonSocial: empresa.razon_social,
+  representante: empresa.representante_legal,
+  email: empresa.email_contacto,
+  telefono: empresa.telefono,
+  ciudad: empresa.ciudad,
+  sector: empresa.sector_economico
+});
+
+const mapExpediente = (expediente) => ({
+  id: expediente.id,
+  radicado: expediente.radicado,
+  organizacionId: expediente.organizacion_id,
+  moduloCodigo: expediente.modulo_codigo,
+  titulo: expediente.titulo,
+  descripcion: expediente.descripcion,
+  estado: expediente.estado,
+  porcentajeAvance: expediente.porcentaje_avance,
+  fechaCreacion: expediente.created_at?.split('T')[0],
+  fechaLimite: expediente.fecha_limite
+});
+
+const mapDocumento = (documento) => ({
+  id: documento.id,
+  expedienteId: documento.expediente_id,
+  tipo: documento.tipo,
+  categoria: documento.categoria_documento,
+  nombreArchivo: documento.nombre_archivo,
+  rutaStorage: documento.ruta_storage,
+  tamano: documento.tamano_bytes
+    ? `${(documento.tamano_bytes / (1024 * 1024)).toFixed(1)} MB`
+    : '0.0 MB',
+  formato: documento.formato,
+  fechaSubida: documento.created_at?.split('T')[0],
+  subidoPor: documento.subido_por_email,
+  estado: documento.estado_validacion,
+  observaciones: documento.observaciones || '',
+  archivoDisponible: Boolean(documento.ruta_storage)
+});
+
 export const ALL_EMPRESAS = [
   {
     id: 'emp-1',
@@ -347,14 +391,21 @@ export const dataService = {
         if (!error && data?.user) {
           console.log('[Login] Supabase OK:', data.user.email);
           const userSup = data.user;
-          // Buscar datos adicionales en el mock local (rol, empresaId, etc.)
+          const { data: profile, error: profileError } = await supabase
+            .from('perfiles_usuarios')
+            .select('id, email, nombre_completo, rol, organizacion_id')
+            .eq('id', userSup.id)
+            .maybeSingle();
+          if (profileError) throw new Error(`No se pudo cargar el perfil: ${profileError.message}`);
+
+          // Fallback local únicamente para instalaciones que aún no tienen perfiles creados.
           const localUser = ALL_USUARIOS.find(u => u.email.toLowerCase() === cleanEmail);
           const session = {
             id: userSup.id,
             email: userSup.email,
-            nombre: localUser?.nombre || userSup.user_metadata?.full_name || cleanEmail,
-            rol: localUser?.rol || userSup.app_metadata?.role || 'cliente',
-            empresaId: localUser?.empresaId || null,
+            nombre: profile?.nombre_completo || localUser?.nombre || userSup.user_metadata?.full_name || cleanEmail,
+            rol: profile?.rol || localUser?.rol || userSup.app_metadata?.role || 'cliente',
+            empresaId: profile?.organizacion_id || localUser?.empresaId || null,
             razonSocial: localUser?.razonSocial || localUser?.nombre || '',
           };
           setStorage(STORAGE_KEYS.SESSION, session);
@@ -364,6 +415,11 @@ export const dataService = {
       } catch (err) {
         console.warn('[Login] Excepción Supabase, intentando con usuarios locales:', err.message);
       }
+    }
+
+    if (isSupabaseConfigured) {
+      console.error('[Login] Supabase está configurado, pero la autenticación no fue válida.');
+      return null;
     }
 
     // Fallback siempre disponible: usuarios locales (mock)
@@ -432,10 +488,26 @@ export const dataService = {
   },
 
   getEmpresas: async () => {
+    if (isSupabaseConfigured && supabase) {
+      const { data, error } = await supabase
+        .from('organizaciones')
+        .select('*')
+        .order('created_at', { ascending: true });
+      if (error) throw new Error(`No se pudieron cargar las empresas: ${error.message}`);
+      return (data || []).map(mapEmpresa);
+    }
     return getMergedStorage(STORAGE_KEYS.EMPRESAS, ALL_EMPRESAS);
   },
 
   getExpedientes: async (filtros = {}) => {
+    if (isSupabaseConfigured && supabase) {
+      let query = supabase.from('expedientes').select('*').order('created_at', { ascending: false });
+      if (filtros.organizacionId) query = query.eq('organizacion_id', filtros.organizacionId);
+      if (filtros.moduloCodigo && filtros.moduloCodigo !== 'TODOS') query = query.eq('modulo_codigo', filtros.moduloCodigo);
+      const { data, error } = await query;
+      if (error) throw new Error(`No se pudieron cargar los expedientes: ${error.message}`);
+      return (data || []).map(mapExpediente);
+    }
     let items = getMergedStorage(STORAGE_KEYS.EXPEDIENTES, ALL_EXPEDIENTES);
     if (filtros.organizacionId) {
       items = items.filter(exp => exp.organizacionId === filtros.organizacionId);
@@ -472,16 +544,96 @@ export const dataService = {
   },
 
   getDocumentos: async (expedienteId) => {
+    if (isSupabaseConfigured && supabase) {
+      const { data, error } = await supabase
+        .from('documentos')
+        .select('*')
+        .eq('expediente_id', expedienteId)
+        .order('created_at', { ascending: false });
+      if (error) throw new Error(`No se pudieron cargar los documentos: ${error.message}`);
+      return (data || []).map(mapDocumento);
+    }
     const docs = getMergedStorage(STORAGE_KEYS.DOCUMENTOS, ALL_DOCUMENTOS);
     return docs.filter(d => d.expedienteId === expedienteId);
   },
 
   getAllDocumentos: async () => {
-    return getMergedStorage(STORAGE_KEYS.DOCUMENTOS, ALL_DOCUMENTOS);
+    if (isSupabaseConfigured && supabase) {
+      const { data, error } = await supabase
+        .from('documentos')
+        .select('*')
+        .order('created_at', { ascending: false });
+      if (error) throw new Error(`No se pudieron cargar los documentos: ${error.message}`);
+      return (data || []).map(mapDocumento);
+    }
+    return getMergedStorage(STORAGE_KEYS.DOCUMENTOS, ALL_DOCUMENTOS).map(doc => ({
+      ...doc,
+      archivoDisponible: uploadedFiles.has(doc.id)
+    }));
   },
 
-  uploadDocumento: async ({ expedienteId, tipo, categoria, file, subidoPor, observaciones = '' }) => {
+  uploadDocumento: async ({ expedienteId, tipo, categoria, file, subidoPor, observaciones = '', reemplazaDocumentoId }) => {
+    if (isSupabaseConfigured && supabase) {
+      if (reemplazaDocumentoId) {
+        const { data: previous, error: previousError } = await supabase
+          .from('documentos')
+          .select('id, estado_validacion')
+          .eq('id', reemplazaDocumentoId)
+          .single();
+        if (previousError) throw new Error(`No se pudo validar el documento anterior: ${previousError.message}`);
+        if (previous.estado_validacion !== 'observaciones') {
+          throw new Error('Solo puedes reemplazar un documento al que se le solicitó corrección.');
+        }
+      }
+
+      const storagePath = `${expedienteId}/${Date.now()}-${file.name.replace(/[^\w.-]/g, '_')}`;
+      const { error: uploadError } = await supabase.storage
+        .from('documentos')
+        .upload(storagePath, file, { upsert: false, contentType: file.type || 'application/octet-stream' });
+      if (uploadError) throw new Error(`No se pudo subir el archivo: ${uploadError.message}`);
+
+      const { data: inserted, error: insertError } = await supabase
+        .from('documentos')
+        .insert({
+          expediente_id: expedienteId,
+          tipo,
+          nombre_archivo: file.name,
+          categoria_documento: categoria,
+          ruta_storage: storagePath,
+          tamano_bytes: file.size,
+          formato: file.name.split('.').pop().toUpperCase(),
+          subido_por_email: subidoPor,
+          estado_validacion: tipo === 'requisito_cliente' ? 'pendiente' : 'aprobado',
+          observaciones: observaciones || (tipo === 'requisito_cliente'
+            ? 'En espera de revisión técnica por YabaGroup.'
+            : 'Documento oficial entregado por YabaGroup.')
+        })
+        .select('*')
+        .single();
+      if (insertError) {
+        await supabase.storage.from('documentos').remove([storagePath]);
+        throw new Error(`No se pudo registrar el documento: ${insertError.message}`);
+      }
+
+      if (reemplazaDocumentoId) {
+        const { error: deleteError } = await supabase
+          .from('documentos')
+          .delete()
+          .eq('id', reemplazaDocumentoId);
+        if (deleteError) throw new Error(`La nueva versión se subió, pero no se pudo reemplazar la anterior: ${deleteError.message}`);
+      }
+      return mapDocumento(inserted);
+    }
+
     const docs = getMergedStorage(STORAGE_KEYS.DOCUMENTOS, ALL_DOCUMENTOS);
+    const documentoReemplazado = reemplazaDocumentoId
+      ? docs.find(doc => doc.id === reemplazaDocumentoId)
+      : null;
+
+    if (reemplazaDocumentoId && (!documentoReemplazado || documentoReemplazado.estado !== 'observaciones')) {
+      throw new Error('Solo puedes reemplazar un documento al que se le solicitó corrección.');
+    }
+
     const nuevoDoc = {
       id: `doc-${Date.now()}`,
       expedienteId,
@@ -496,15 +648,102 @@ export const dataService = {
       observaciones: observaciones || (tipo === 'requisito_cliente' ? 'En espera de revisión técnica por YabaGroup.' : 'Documento oficial entregado por YabaGroup.')
     };
 
-    docs.unshift(nuevoDoc);
-    setStorage(STORAGE_KEYS.DOCUMENTOS, docs);
+    if (documentoReemplazado) {
+      uploadedFiles.delete(documentoReemplazado.id);
+    }
+    uploadedFiles.set(nuevoDoc.id, file);
+    const documentosActualizados = documentoReemplazado
+      ? [nuevoDoc, ...docs.filter(doc => doc.id !== reemplazaDocumentoId)]
+      : [nuevoDoc, ...docs];
+    setStorage(STORAGE_KEYS.DOCUMENTOS, documentosActualizados);
     return nuevoDoc;
   },
 
-  updateDocumentoEstado: async (docId, nuevoEstado, observaciones) => {
+  downloadDocumento: (doc) => {
+    if (isSupabaseConfigured && supabase && doc.rutaStorage) {
+      const { data } = supabase.storage.from('documentos').getPublicUrl(doc.rutaStorage);
+      window.open(data.publicUrl, '_blank', 'noopener,noreferrer');
+      return;
+    }
+    const file = uploadedFiles.get(doc.id);
+    if (!file) {
+      throw new Error('El archivo original no está disponible en esta sesión. Solicita que lo vuelvan a cargar.');
+    }
+
+    const url = URL.createObjectURL(file);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = doc.nombreArchivo;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
+  },
+
+  deleteDocumento: async (docId) => {
     const docs = getMergedStorage(STORAGE_KEYS.DOCUMENTOS, ALL_DOCUMENTOS);
+    const documentToDelete = docs.find(doc => doc.id === docId);
+
+    if (!documentToDelete) {
+      throw new Error('No se encontró el documento que deseas eliminar.');
+    }
+    if (documentToDelete.estado !== 'observaciones') {
+      throw new Error('Solo puedes eliminar documentos que tienen una corrección solicitada.');
+    }
+
+    uploadedFiles.delete(docId);
+    const updated = docs.filter(doc => doc.id !== docId);
+    setStorage(STORAGE_KEYS.DOCUMENTOS, updated);
+  },
+
+  updateDocumentoEstado: async (docId, nuevoEstado, observaciones) => {
+    if (isSupabaseConfigured && supabase) {
+      const { data: target, error: targetError } = await supabase
+        .from('documentos')
+        .select('id, expediente_id, tipo, categoria_documento, estado_validacion')
+        .eq('id', docId)
+        .single();
+      if (targetError) throw new Error(`No se encontró el documento: ${targetError.message}`);
+
+      let query = supabase
+        .from('documentos')
+        .update({
+          estado_validacion: nuevoEstado,
+          observaciones: observaciones || null
+        })
+        .eq('id', docId);
+
+      if (nuevoEstado === 'observaciones') {
+        query = supabase
+          .from('documentos')
+          .update({
+            estado_validacion: nuevoEstado,
+            observaciones: observaciones || null
+          })
+          .eq('expediente_id', target.expediente_id)
+          .eq('tipo', target.tipo)
+          .eq('categoria_documento', target.categoria_documento)
+          .neq('estado_validacion', 'aprobado');
+      }
+
+      const { data, error } = await query.select('*');
+      if (error) throw new Error(`No se pudo actualizar el estado: ${error.message}`);
+      return (data || []).map(mapDocumento);
+    }
+
+    const docs = getMergedStorage(STORAGE_KEYS.DOCUMENTOS, ALL_DOCUMENTOS);
+    const documentoObjetivo = docs.find(d => d.id === docId);
+
+    if (!documentoObjetivo) {
+      throw new Error('No se encontró el documento que deseas actualizar.');
+    }
+
     const updated = docs.map(d => {
-      if (d.id === docId) {
+      const mismaCategoria = d.expedienteId === documentoObjetivo.expedienteId
+        && d.tipo === documentoObjetivo.tipo
+        && d.categoria === documentoObjetivo.categoria;
+
+      if (d.id === docId || (nuevoEstado === 'observaciones' && mismaCategoria && d.estado !== 'aprobado')) {
         return { ...d, estado: nuevoEstado, observaciones: observaciones || d.observaciones };
       }
       return d;

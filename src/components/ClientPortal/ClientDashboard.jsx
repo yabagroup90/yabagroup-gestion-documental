@@ -12,6 +12,7 @@ import {
   Sparkles
 } from 'lucide-react';
 import { MODULOS_CONFIG } from '../../data/modulesConfig';
+import { dataService } from '../../services/dataService';
 
 export default function ClientDashboard({ 
   empresa, 
@@ -214,7 +215,11 @@ export default function ClientDashboard({
               {/* Checklist de requisitos de este módulo */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                 {moduloInfo?.requisitosCliente.map((req) => {
-                  const docSubido = requisitosSubidos.find(d => d.categoria === req.nombre);
+                  const documentosDelRequisito = requisitosSubidos
+                    .filter(d => d.categoria === req.nombre)
+                    .sort((a, b) => String(b.fechaSubida || '').localeCompare(String(a.fechaSubida || '')));
+                  const docSubido = documentosDelRequisito.find(d => d.estado === 'observaciones')
+                    || documentosDelRequisito[0];
 
                   return (
                     <div 
@@ -222,8 +227,8 @@ export default function ClientDashboard({
                       style={{
                         padding: '0.85rem 1rem',
                         borderRadius: '10px',
-                        background: docSubido ? 'rgba(16, 185, 129, 0.06)' : 'rgba(15, 23, 42, 0.6)',
-                        border: `1px solid ${docSubido ? 'rgba(16, 185, 129, 0.25)' : 'var(--border-color)'}`,
+                        background: docSubido?.estado === 'observaciones' ? 'rgba(239, 68, 68, 0.08)' : docSubido ? 'rgba(16, 185, 129, 0.06)' : 'rgba(15, 23, 42, 0.6)',
+                        border: `1px solid ${docSubido?.estado === 'observaciones' ? 'rgba(239, 68, 68, 0.45)' : docSubido ? 'rgba(16, 185, 129, 0.25)' : 'var(--border-color)'}`,
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'space-between',
@@ -233,8 +238,8 @@ export default function ClientDashboard({
                     >
                       <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                         {docSubido ? (
-                          <div style={{ width: 28, height: 28, borderRadius: '50%', background: 'rgba(16, 185, 129, 0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                            <CheckCircle size={16} color="#10b981" />
+                          <div style={{ width: 28, height: 28, borderRadius: '50%', background: docSubido.estado === 'observaciones' ? 'rgba(239, 68, 68, 0.2)' : 'rgba(16, 185, 129, 0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            {docSubido.estado === 'observaciones' ? <AlertTriangle size={16} color="#f87171" /> : <CheckCircle size={16} color="#10b981" />}
                           </div>
                         ) : (
                           <div style={{ width: 28, height: 28, borderRadius: '50%', background: 'rgba(245, 158, 11, 0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -253,9 +258,16 @@ export default function ClientDashboard({
                           </div>
                           
                           {docSubido ? (
-                            <p style={{ fontSize: '0.75rem', color: '#94a3b8', margin: '0.15rem 0 0' }}>
-                              Archivo: <span style={{ color: '#38bdf8' }}>{docSubido.nombreArchivo}</span> ({docSubido.tamano}) &bull; Subido el {docSubido.fechaSubida}
-                            </p>
+                            <div>
+                              <p style={{ fontSize: '0.75rem', color: '#94a3b8', margin: '0.15rem 0 0' }}>
+                                Archivo: <span style={{ color: '#38bdf8' }}>{docSubido.nombreArchivo}</span> ({docSubido.tamano}) &bull; Subido el {docSubido.fechaSubida}
+                              </p>
+                              {docSubido.estado === 'observaciones' && (
+                                <p style={{ fontSize: '0.75rem', color: '#fca5a5', margin: '0.35rem 0 0', lineHeight: 1.35 }}>
+                                  <strong>Corrección solicitada:</strong> {docSubido.observaciones || 'El asesor solicitó revisar este documento.'}
+                                </p>
+                              )}
+                            </div>
                           ) : (
                             <p style={{ fontSize: '0.75rem', color: 'var(--text-dim)', margin: '0.15rem 0 0' }}>
                               Formato sugerido: {req.formato} &bull; Pendiente de adjuntar
@@ -266,9 +278,30 @@ export default function ClientDashboard({
 
                       <div>
                         {docSubido ? (
-                          <span className={`badge ${docSubido.estado === 'aprobado' ? 'badge-success' : 'badge-warning'}`}>
-                            {docSubido.estado === 'aprobado' ? 'Validado por Asesor' : 'En Revisión'}
-                          </span>
+                          docSubido.estado === 'observaciones' ? (
+                            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '0.45rem' }}>
+                              <span className="badge badge-danger">Corrección solicitada</span>
+                              <button
+                                className="btn btn-sm"
+                                onClick={() => onOpenUploadModal({
+                                  expedienteId: activeExpediente.id,
+                                  tipo: 'requisito_cliente',
+                                  moduloCodigo: activeExpediente.moduloCodigo,
+                                  categoriaPreseleccionada: req.nombre,
+                                  categoriasDisponibles: moduloInfo?.requisitosCliente.map(r => r.nombre) || [],
+                                  reemplazaDocumentoId: docSubido.id
+                                })}
+                                style={{ background: 'rgba(239, 68, 68, 0.15)', color: '#fca5a5', border: '1px solid rgba(239, 68, 68, 0.4)' }}
+                              >
+                                <UploadCloud size={12} />
+                                <span>Subir corrección</span>
+                              </button>
+                            </div>
+                          ) : (
+                            <span className={`badge ${docSubido.estado === 'aprobado' ? 'badge-success' : 'badge-warning'}`}>
+                              {docSubido.estado === 'aprobado' ? 'Validado por Asesor' : 'En Revisión'}
+                            </span>
+                          )
                         ) : (
                           <button 
                             className="btn btn-secondary btn-sm"
@@ -350,15 +383,22 @@ export default function ClientDashboard({
                         </div>
                       </div>
 
-                      <a 
-                        href={`data:text/plain;charset=utf-8,${encodeURIComponent(`Documento oficial YabaGroup: ${doc.categoria}\nExpediente: ${activeExpediente.radicado}\nCliente: ${empresa?.razonSocial}\nValidez y trazabilidad legal garantizada.`)}`}
-                        download={doc.nombreArchivo}
+                      <button
+                        type="button"
+                        onClick={() => {
+                          try {
+                            dataService.downloadDocumento(doc);
+                          } catch (error) {
+                            alert(error.message);
+                          }
+                        }}
+                        disabled={!doc.archivoDisponible}
                         className="btn btn-success btn-sm"
                         style={{ boxShadow: '0 2px 10px rgba(16, 185, 129, 0.3)' }}
                       >
                         <Download size={14} />
-                        <span>Descargar Oficial</span>
-                      </a>
+                        <span>{doc.archivoDisponible ? 'Descargar Oficial' : 'Archivo no disponible'}</span>
+                      </button>
                     </div>
                   ))}
                 </div>

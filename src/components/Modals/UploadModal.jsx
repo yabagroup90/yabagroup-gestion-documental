@@ -34,6 +34,7 @@ export default function UploadModal({ isOpen, onClose, config, onUploadSuccess }
         expedienteId,
         tipo,
         categoria,
+        reemplazaDocumentoId: config.reemplazaDocumentoId,
         file,
         subidoPor: isCliente ? 'contacto@constructoraandina.com' : 'asesor@yabagroup.com',
         observaciones

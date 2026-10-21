@@ -71,6 +71,18 @@ export default function App() {
     }
   }, []);
 
+  // Sincronizar los cambios realizados desde otra pestaña o sesión del navegador.
+  useEffect(() => {
+    const handleStorageChange = (event) => {
+      if (event.key === 'yabagroup_documentos_v2') {
+        loadData();
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, []);
+
   // Login handler
   const handleLogin = async (email, password) => {
     const session = await dataService.login(email, password);

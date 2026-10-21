@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { X, CheckCircle2, AlertTriangle, FileText, Download, MessageSquare } from 'lucide-react';
+import { dataService } from '../../services/dataService';
 
 export default function ReviewModal({ isOpen, onClose, expediente, documentos = [], onUpdateDocEstado }) {
   if (!isOpen || !expediente) return null;
@@ -141,15 +142,22 @@ export default function ReviewModal({ isOpen, onClose, expediente, documentos = 
 
                 {/* Descarga simulada */}
                 <div style={{ marginBottom: '1.25rem' }}>
-                  <a 
-                    href={`data:text/plain;charset=utf-8,${encodeURIComponent(`Contenido de prueba de ${selectedDoc.nombreArchivo}`)}`}
-                    download={selectedDoc.nombreArchivo}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      try {
+                        dataService.downloadDocumento(selectedDoc);
+                      } catch (error) {
+                        alert(error.message);
+                      }
+                    }}
+                    disabled={!selectedDoc.archivoDisponible}
                     className="btn btn-secondary btn-sm"
                     style={{ width: '100%' }}
                   >
                     <Download size={14} />
-                    <span>Descargar Archivo para Revisión</span>
-                  </a>
+                    <span>{selectedDoc.archivoDisponible ? 'Descargar Archivo para Revisión' : 'Archivo no disponible'}</span>
+                  </button>
                 </div>
 
                 {/* Formulario de Validación */}
