@@ -75,7 +75,7 @@ export default function LoginView({ onLogin }) {
 
       <div style={{ width: '100%', maxWidth: '520px', position: 'relative', zIndex: 1 }}>
         
-        {/* Brand Header con el Logo Real de YabaGroup */}
+        {/* Brand Header con el Logo Real de YaBaGroup */}
         <div style={{ textAlign: 'center', marginBottom: '1.75rem' }}>
           <div style={{
             display: 'inline-block',
@@ -88,7 +88,7 @@ export default function LoginView({ onLogin }) {
           }}>
             <img 
               src="/logo.jpg" 
-              alt="YabaGroup Gestión Documental Logo" 
+              alt="YaBaGroup Gestión Documental Logo" 
               style={{
                 width: 105,
                 height: 105,
@@ -100,7 +100,7 @@ export default function LoginView({ onLogin }) {
           </div>
           
           <h1 className="brand-font" style={{ fontSize: '1.85rem', fontWeight: 800, margin: 0, color: '#ffffff', letterSpacing: '-0.02em' }}>
-            YabaGroup
+            YaBaGroup
           </h1>
           <p style={{ fontSize: '0.85rem', color: '#94a3b8', marginTop: '0.25rem', letterSpacing: '0.04em', textTransform: 'uppercase', fontWeight: 600 }}>
             Gestión Documental & Asesorías Corporativas

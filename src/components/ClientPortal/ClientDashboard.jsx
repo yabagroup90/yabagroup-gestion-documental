@@ -78,7 +78,7 @@ export default function ClientDashboard({
 
           <div style={{ textAlign: 'right' }}>
             <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-              Asesor Asignado YabaGroup
+              Asesor Asignado YaBaGroup
             </span>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', justifyContent: 'flex-end', marginTop: '0.2rem' }}>
               <ShieldCheck size={16} color="#10b981" />
@@ -194,7 +194,7 @@ export default function ClientDashboard({
                     <span>Insumos y Requisitos por Subir</span>
                   </h3>
                   <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', margin: '0.2rem 0 0' }}>
-                    Documentos necesarios para que YabaGroup pueda elaborar tu expediente.
+                    Documentos necesarios para que YaBaGroup pueda elaborar tu expediente.
                   </p>
                 </div>
 
@@ -328,7 +328,7 @@ export default function ClientDashboard({
                 <div>
                   <h3 style={{ fontSize: '1.1rem', fontWeight: 700, margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#34d399' }}>
                     <Sparkles size={20} color="#10b981" />
-                    <span>Entregables Oficiales de YabaGroup</span>
+                    <span>Entregables Oficiales de YaBaGroup</span>
                   </h3>
                   <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', margin: '0.2rem 0 0' }}>
                     Documentación definitiva elaborada por el equipo de asesoría, lista para radicar o certificar.
@@ -340,7 +340,7 @@ export default function ClientDashboard({
                 <div style={{ padding: '2rem', textAlign: 'center', background: 'rgba(15, 23, 42, 0.4)', borderRadius: '12px' }}>
                   <FileText size={36} color="var(--text-dim)" style={{ marginBottom: '0.5rem' }} />
                   <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)', margin: 0 }}>
-                    Tu asesor YabaGroup está procesando los insumos para elaborar los entregables oficiales.
+                    Tu asesor YaBaGroup está procesando los insumos para elaborar los entregables oficiales.
                   </p>
                   <p style={{ fontSize: '0.75rem', color: 'var(--text-dim)', marginTop: '0.3rem' }}>
                     Una vez aprobados, aquí podrás descargarlos con sellos y validez técnica.

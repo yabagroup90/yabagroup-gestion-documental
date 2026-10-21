@@ -12,7 +12,7 @@ export default function Navbar({ usuarioActual, onLogout, isLive }) {
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
           <img 
             src="/logo.jpg" 
-            alt="YabaGroup Logo" 
+            alt="YaBaGroup Logo" 
             style={{ 
               width: 44, 
               height: 44, 
@@ -27,14 +27,14 @@ export default function Navbar({ usuarioActual, onLogout, isLive }) {
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
               <span className="brand-font" style={{ fontSize: '1.25rem', fontWeight: 800, letterSpacing: '-0.02em', background: 'linear-gradient(90deg, #ffffff, #94a3b8)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-                YabaGroup
+                YaBaGroup
               </span>
               <span style={{ fontSize: '0.75rem', fontWeight: 700, padding: '0.15rem 0.5rem', borderRadius: 4, background: 'rgba(37, 99, 235, 0.2)', color: '#60a5fa', border: '1px solid rgba(37, 99, 235, 0.4)' }}>
                 Gestión Documental
               </span>
             </div>
             <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', margin: 0 }}>
-              {isCliente ? `Portal Privado: ${usuarioActual?.razonSocial || usuarioActual?.nombre}` : 'Panel de Control YabaGroup'}
+              {isCliente ? `Portal Privado: ${usuarioActual?.razonSocial || usuarioActual?.nombre}` : 'Panel de Control YaBaGroup'}
             </p>
           </div>
         </div>
@@ -51,7 +51,7 @@ export default function Navbar({ usuarioActual, onLogout, isLive }) {
                 {usuarioActual?.nombre || usuarioActual?.email}
               </div>
               <div style={{ fontSize: '0.7rem', color: isCliente ? '#60a5fa' : '#34d399' }}>
-                {isCliente ? 'Cuenta Cliente' : 'Administrador YabaGroup'}
+                {isCliente ? 'Cuenta Cliente' : 'Administrador YaBaGroup'}
               </div>
             </div>
           </div>

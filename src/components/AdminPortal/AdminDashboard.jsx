@@ -67,7 +67,7 @@ export default function AdminDashboard({
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
               <h1 style={{ fontSize: '1.35rem', fontWeight: 800, margin: 0, color: '#ffffff' }}>
-                Panel de Administración YabaGroup
+                Panel de Administración YaBaGroup
               </h1>
               <span className="badge badge-success">Operaciones</span>
             </div>
