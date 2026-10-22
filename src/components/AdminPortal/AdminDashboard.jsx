@@ -202,7 +202,7 @@ export default function AdminDashboard({
               <div className="admin-card-footer" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem', paddingTop: '0.5rem', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
                 
                 {/* Contador de documentos */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem', fontSize: '0.825rem' }}>
+                <div className="admin-card-counters" style={{ display: 'flex', alignItems: 'center', gap: '1.25rem', fontSize: '0.825rem' }}>
                   <div>
                     Insumos subidos por el cliente: <strong style={{ color: requisitosSubidos.length > 0 ? '#38bdf8' : '#fbbf24' }}>{requisitosSubidos.length} archivo(s)</strong>
                   </div>
@@ -212,10 +212,10 @@ export default function AdminDashboard({
                 </div>
 
                 {/* Botones de Acción */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+                <div className="admin-card-actions" style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
                   {/* Botón 1: Ver y revisar lo que el cliente subió */}
                   <button 
-                    className="btn btn-secondary btn-sm"
+                    className="btn btn-secondary btn-sm admin-card-action"
                     onClick={() => onOpenReviewModal(exp)}
                   >
                     <Eye size={14} />
@@ -224,7 +224,7 @@ export default function AdminDashboard({
 
                   {/* Botón 2: Montarle su documento final */}
                   <button 
-                    className="btn btn-success btn-sm"
+                    className="btn btn-success btn-sm admin-card-action"
                     onClick={() => onOpenUploadModal({
                       expedienteId: exp.id,
                       tipo: 'entregable_yabagroup',

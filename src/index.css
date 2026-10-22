@@ -413,6 +413,27 @@ textarea {
     width: 100%;
   }
 
+  .admin-card-counters {
+    align-items: stretch !important;
+    flex-direction: column;
+    gap: 0.5rem !important;
+  }
+
+  .admin-card-actions {
+    align-items: stretch !important;
+    flex-direction: column;
+    gap: 0.55rem !important;
+  }
+
+  .admin-card-action {
+    width: 100%;
+    min-width: 0;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    line-height: 1.3;
+    text-align: center;
+  }
+
   .client-layout {
     grid-template-columns: minmax(0, 1fr) !important;
     gap: 1rem !important;
