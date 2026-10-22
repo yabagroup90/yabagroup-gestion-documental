@@ -59,7 +59,7 @@ export default function NewExpedienteModal({ isOpen, onClose, empresas = [], onC
       zIndex: 1000,
       padding: '1rem'
     }}>
-      <div className="glass-panel animate-fade-in" style={{ width: '100%', maxWidth: '560px', padding: '1.75rem', background: '#0f172a', border: '1px solid var(--border-light)' }}>
+      <div className="glass-panel animate-fade-in modal-panel" style={{ width: '100%', maxWidth: '560px', padding: '1.75rem', background: '#0f172a', border: '1px solid var(--border-light)' }}>
         
         {/* Header */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.25rem' }}>

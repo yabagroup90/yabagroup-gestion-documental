@@ -31,7 +31,7 @@ export default function LoginView({ onLogin }) {
 
 
   return (
-    <div style={{
+    <div className="login-page" style={{
       minHeight: '100vh',
       display: 'flex',
       alignItems: 'center',
@@ -108,7 +108,7 @@ export default function LoginView({ onLogin }) {
         </div>
 
         {/* Login Card */}
-        <div className="glass-panel" style={{ padding: '2rem', border: '1px solid var(--border-light)', boxShadow: '0 20px 50px rgba(0,0,0,0.6)' }}>
+        <div className="glass-panel login-card" style={{ padding: '2rem', border: '1px solid var(--border-light)', boxShadow: '0 20px 50px rgba(0,0,0,0.6)' }}>
           <h2 style={{ fontSize: '1.25rem', fontWeight: 700, marginBottom: '0.35rem', color: '#ffffff' }}>
             Iniciar Sesión
           </h2>

@@ -63,7 +63,7 @@ export default function ReviewModal({ isOpen, onClose, expediente, documentos = 
       zIndex: 1000,
       padding: '1rem'
     }}>
-      <div className="glass-panel animate-fade-in" style={{ width: '100%', maxWidth: '780px', maxHeight: '90vh', overflowY: 'auto', padding: '1.75rem', background: '#0f172a', border: '1px solid var(--border-light)' }}>
+      <div className="glass-panel animate-fade-in modal-panel" style={{ width: '100%', maxWidth: '780px', maxHeight: '90vh', overflowY: 'auto', padding: '1.75rem', background: '#0f172a', border: '1px solid var(--border-light)' }}>
         
         {/* Header */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.25rem', borderBottom: '1px solid var(--border-color)', paddingBottom: '1rem' }}>

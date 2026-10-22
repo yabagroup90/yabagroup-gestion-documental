@@ -6,7 +6,7 @@ export default function Navbar({ usuarioActual, onLogout, isLive }) {
 
   return (
     <header className="glass-panel" style={{ borderRadius: 0, borderTop: 0, borderLeft: 0, borderRight: 0, position: 'sticky', top: 0, zIndex: 100, marginBottom: '1.5rem' }}>
-      <div className="app-container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.85rem 1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
+      <div className="app-container navbar-inner" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.85rem 1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
         
         {/* Brand */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>

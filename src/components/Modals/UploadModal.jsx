@@ -70,7 +70,7 @@ export default function UploadModal({ isOpen, onClose, config, onUploadSuccess }
       zIndex: 1000,
       padding: '1rem'
     }}>
-      <div className="glass-panel animate-fade-in" style={{ width: '100%', maxWidth: '520px', padding: '1.75rem', background: '#0f172a', border: '1px solid var(--border-light)' }}>
+      <div className="glass-panel animate-fade-in modal-panel" style={{ width: '100%', maxWidth: '520px', padding: '1.75rem', background: '#0f172a', border: '1px solid var(--border-light)' }}>
         
         {/* Header */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.25rem' }}>
@@ -163,7 +163,7 @@ export default function UploadModal({ isOpen, onClose, config, onUploadSuccess }
           </div>
 
           {/* Actions */}
-          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.75rem', marginTop: '0.5rem' }}>
+          <div className="modal-actions" style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.75rem', marginTop: '0.5rem' }}>
             <button 
               type="button" 
               onClick={onClose} 

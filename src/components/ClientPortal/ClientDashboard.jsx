@@ -48,7 +48,7 @@ export default function ClientDashboard({
     <div className="animate-fade-in">
       
       {/* Company Header Card */}
-      <div className="glass-panel" style={{ padding: '1.5rem', marginBottom: '1.5rem', borderLeft: '4px solid var(--primary)' }}>
+      <div className="glass-panel client-header" style={{ padding: '1.5rem', marginBottom: '1.5rem', borderLeft: '4px solid var(--primary)' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
             <div style={{
@@ -89,7 +89,7 @@ export default function ClientDashboard({
       </div>
 
       {/* Main Grid: Left = Expedientes list, Right = Selected Expediente Work Area */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1.5rem', alignItems: 'start' }}>
+      <div className="client-layout" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1.5rem', alignItems: 'start' }}>
         
         {/* LEFT COLUMN: Tus Asesorías / Expedientes */}
         <div>

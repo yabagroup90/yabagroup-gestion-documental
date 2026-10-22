@@ -73,7 +73,7 @@ export default function HabilitarClienteModal({ isOpen, onClose, onHabilitarClie
       zIndex: 1000,
       padding: '1rem'
     }}>
-      <div className="glass-panel animate-fade-in" style={{ width: '100%', maxWidth: '580px', maxHeight: '90vh', overflowY: 'auto', padding: '1.75rem', background: '#0f172a', border: '1px solid var(--border-light)' }}>
+      <div className="glass-panel animate-fade-in modal-panel" style={{ width: '100%', maxWidth: '580px', maxHeight: '90vh', overflowY: 'auto', padding: '1.75rem', background: '#0f172a', border: '1px solid var(--border-light)' }}>
         
         {/* Header */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.25rem', borderBottom: '1px solid var(--border-color)', paddingBottom: '0.85rem' }}>
