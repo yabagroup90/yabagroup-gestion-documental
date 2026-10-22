@@ -40,9 +40,9 @@ export default function Navbar({ usuarioActual, onLogout, isLive }) {
         </div>
 
         {/* Right: User session info & Logout button */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
+        <div className="navbar-user-actions" style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
           
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', background: 'rgba(15, 23, 42, 0.7)', padding: '0.4rem 0.85rem', borderRadius: 10, border: '1px solid var(--border-color)' }}>
+          <div className="navbar-user-card" style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', background: 'rgba(15, 23, 42, 0.7)', padding: '0.4rem 0.85rem', borderRadius: 10, border: '1px solid var(--border-color)' }}>
             <div style={{ width: 28, height: 28, borderRadius: '50%', background: isCliente ? 'rgba(37,99,235,0.2)' : 'rgba(16,185,129,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               {isCliente ? <Building2 size={16} color="#60a5fa" /> : <ShieldCheck size={16} color="#34d399" />}
             </div>
@@ -59,7 +59,7 @@ export default function Navbar({ usuarioActual, onLogout, isLive }) {
           {/* Logout Button */}
           <button 
             onClick={onLogout}
-            className="btn btn-secondary btn-sm"
+            className="btn btn-secondary btn-sm navbar-logout"
             style={{ color: '#f87171', borderColor: 'rgba(239,68,68,0.3)', background: 'rgba(239,68,68,0.08)' }}
             title="Cerrar sesión actual"
           >

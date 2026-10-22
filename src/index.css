@@ -337,6 +337,22 @@ textarea {
     justify-content: space-between;
   }
 
+  .navbar-user-actions {
+    min-width: 0;
+    flex-wrap: nowrap !important;
+    gap: 0.5rem !important;
+  }
+
+  .navbar-user-card {
+    min-width: 0;
+    flex: 1 1 auto;
+  }
+
+  .navbar-logout {
+    flex: 0 0 auto;
+    min-height: 40px;
+  }
+
   .navbar-inner > div:last-child > div:first-child {
     min-width: 0;
     flex: 1;
@@ -466,16 +482,20 @@ textarea {
     font-size: 0.65rem !important;
   }
 
-  .navbar-inner > div:last-child {
-    gap: 0.5rem !important;
+  .navbar-user-actions {
+    align-items: stretch !important;
   }
 
-  .navbar-inner .btn {
+  .navbar-user-card {
+    padding: 0.4rem 0.6rem !important;
+  }
+
+  .navbar-logout {
     padding: 0.5rem 0.65rem;
   }
 
-  .navbar-inner .btn span {
-    display: none;
+  .navbar-logout span {
+    display: inline;
   }
 
   .badge {
